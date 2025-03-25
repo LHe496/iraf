@@ -114,11 +114,11 @@ begin
 
 	    switch (Memc[ibuf]) {
 	    case '\n':
-		if (in_para == true) {
+		if (in_para) {
 		    call fprintf (out, "</p>\n")
 		    in_para = false
 		}
-		if (in_pre == true) {
+		if (in_pre) {
 		    call fprintf (out, "\n")
 		}
 	    case '.':
@@ -137,16 +137,16 @@ begin
 
 		switch (cmd) {
 		case FI:		# leave nofill mode; enter normal mode
-		    if (in_pre == true) {
+		    if (in_pre) {
 			call fprintf (out, "</pre>\n")
 			in_pre = false
 		    }
 		case NF:		# leave fill mode (nofill)
-		    if (in_para == true) {
+		    if (in_para) {
 			call fprintf(out, "</p>\n")
 			in_para = false
 		    }
-		    if (in_pre == false) {
+		    if (in_pre) {
 			call fprintf (out, "<pre>\n")
 			in_pre = true
 		    }
@@ -161,7 +161,7 @@ begin
 		    next
 
 		case SH:		# section heading
-		    if (in_para == true) {
+		    if (in_para) {
 			call fprintf(out, "</p>\n")
 			in_para = false
 		    }
@@ -169,7 +169,7 @@ begin
        	    	    Memc[level] = EOS
 		    next
 		case IH:		# indented section heading
-		    if (in_para == true) {
+		    if (in_para) {
 		        call fprintf(out, "</p>\n")
 			in_para = false
 		    }
@@ -193,7 +193,7 @@ begin
 		    if (getline (in, Memc[ibuf]) == EOF)
 			break
 		    else {
-		        if (in_para == true) {
+		        if (in_para) {
 		            call fprintf(out, "</p>\n")
 			    in_para = false
 		        }
@@ -226,7 +226,7 @@ begin
 		    Memc[name+i] = EOS
 	    	    Memc[ibuf+ip+strlen(Memc[ibuf+ip])-1] = EOS
 
-		    if (in_para == true) {
+		    if (in_para) {
 		        call fprintf(out, "</p>\n")
 			in_para = false
 		    }
@@ -291,16 +291,16 @@ begin
 		    # no-op
 		    next
 		case KS:		# start floating keep
-		    if (in_para == true) {
+		    if (in_para) {
 		        call fprintf(out, "</p>\n")
 			in_para = false
 		    }
-		    if (in_pre == false) {
+		    if (in_pre) {
 		        call fprintf (out, "<pre>\n")
 		        in_pre = true
 		    }
 		case KE:		# end floating keep
-		    if (in_pre == true) {
+		    if (in_pre) {
 		        call fprintf (out, "</pre>\n")
 		        in_pre = false
 		    }
@@ -322,7 +322,7 @@ begin
 		    call sprintf (SECTION(sptr,nsec), SZ_LINE, "\'%s\'")
 			call pargstr (Memc[ibuf])
 
-		    if (in_para == true) {
+		    if (in_para) {
 		        call fprintf (out, "</p>\n")
 			in_para = false
 		    }
@@ -353,7 +353,7 @@ begin
 
 		} else {
 		    # Ordinary text line.
-text_		    if (in_para == false && in_pre == false && ls_level == 0) {
+text_		    if ((!in_para) && (!in_pre) && ls_level == 0) {
 			call fprintf (out, "<p>\n")
 			in_para = true
 		    }
@@ -368,7 +368,7 @@ text_		    if (in_para == false && in_pre == false && ls_level == 0) {
 	    call aclrc (Memc[name], SZ_LINE)
 	}
 
-	if (in_para == true) {
+	if (in_para) {
 	    call fprintf(out, "</p>\n")
 	    in_para = false
 	}

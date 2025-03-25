@@ -6,9 +6,9 @@ include	defs
    character str(ARB), buf(ARB)
    filedes fd
 
-   integer isatty
+   logical isatty
 
-   if (isatty(fd) == YES)
+   if (isatty(fd))
 	 {
 	 call putlin (str, fd)
 	 call flush (fd)

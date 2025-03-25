@@ -1373,7 +1373,7 @@ int	n		#I argument
 real	x		#I argument
 
 int	i
-double	uigamma, numerator, denominator
+double  numerator, denominator
 
 begin
 	numerator = exp(-x)
