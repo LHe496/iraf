@@ -419,7 +419,7 @@ begin
 
 		    # Apply a minimum time per exposure if possible.
 		    if (time < minexp && nexp > 1) {
-			nexp = max (1, nexp * time / minexp)
+			nexp = max (1, int(nexp * time / minexp))
 			time = x*sngoal*sngoal/(nexp*snr*snr)
 		    }
 
