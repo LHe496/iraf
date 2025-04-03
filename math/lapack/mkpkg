@@ -24,6 +24,8 @@ liblapack.a:
 	idamax.f
 	ieeeck.f
 	ilaenv.f
+	iparam2stage.f
+	iparmq.f
 	isamax.f
 	lsame.f
 	sgemm.f

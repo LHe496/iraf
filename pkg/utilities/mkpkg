@@ -11,7 +11,7 @@ update:
 relink:
 	@nttools
 
-	$set	LIBS = "-lxtools -lcurfit -lgsurfit -llapack -lmath"
+	$set	LIBS = "-lxtools -lcurfit -lgsurfit -llapack -lm"
 
 	$update	libpkg.a
 	$omake	x_utilities.x
