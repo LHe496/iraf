@@ -233,7 +233,7 @@ pfregs_ (
     }
     /* -noao */
 
-    *sigma0 = varnce / fnpts;
+    *sigma0 = varnce / (*npts);
 
     for (int i = 0; i < *nterms; i++) {
         for (int j = 0; j < *nterms; j++) {
