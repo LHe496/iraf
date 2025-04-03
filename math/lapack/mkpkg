@@ -7,15 +7,23 @@ $exit
 
 liblapack.a:
 	dgemm.f
+	dgemv.f
 	dger.f
 	dgetf2.f
 	dgetrf.f
+	dgetri.f
 	dgetrs.f
 	dlaswp.f
 	dscal.f
 	dswap.f
+	dtrmm.f
+	dtrmv.f
 	dtrsm.f
+	dtrti2.f
+	dtrtri.f
 	idamax.f
+	ieeeck.f
+	ilaenv.f
 	isamax.f
 	lsame.f
 	sgemm.f
@@ -27,4 +35,5 @@ liblapack.a:
 	sscal.f
 	sswap.f
 	strsm.f
+	xerbla.f
 	;
