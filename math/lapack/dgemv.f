@@ -183,9 +183,6 @@
       LOGICAL LSAME
       EXTERNAL LSAME
 *     ..
-*     .. External Subroutines ..
-      EXTERNAL XERBLA
-*     ..
 *     .. Intrinsic Functions ..
       INTRINSIC MAX
 *     ..
@@ -208,7 +205,6 @@
           INFO = 11
       END IF
       IF (INFO.NE.0) THEN
-          CALL XERBLA('DGEMV ',INFO)
           RETURN
       END IF
 *

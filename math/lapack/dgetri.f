@@ -140,8 +140,7 @@
       EXTERNAL           ILAENV
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DGEMM, DGEMV, DSWAP, DTRSM, DTRTRI,
-     $                   XERBLA
+      EXTERNAL           DGEMM, DGEMV, DSWAP, DTRSM, DTRTRI
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX, MIN
@@ -164,7 +163,6 @@
          INFO = -6
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DGETRI', -INFO )
          RETURN
       ELSE IF( LQUERY ) THEN
          RETURN

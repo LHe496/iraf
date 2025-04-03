@@ -135,7 +135,7 @@
       EXTERNAL           LSAME, ILAENV
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DTRMM, DTRSM, DTRTI2, XERBLA
+      EXTERNAL           DTRMM, DTRSM, DTRTI2
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX, MIN
@@ -157,7 +157,6 @@
          INFO = -5
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DTRTRI', -INFO )
          RETURN
       END IF
 *

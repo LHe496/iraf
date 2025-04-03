@@ -172,9 +172,6 @@
       LOGICAL LSAME
       EXTERNAL LSAME
 *     ..
-*     .. External Subroutines ..
-      EXTERNAL XERBLA
-*     ..
 *     .. Intrinsic Functions ..
       INTRINSIC MAX
 *     ..
@@ -199,7 +196,6 @@
           INFO = 8
       END IF
       IF (INFO.NE.0) THEN
-          CALL XERBLA('DTRMV ',INFO)
           RETURN
       END IF
 *

@@ -136,7 +136,7 @@
       EXTERNAL           LSAME
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DSCAL, DTRMV, XERBLA
+      EXTERNAL           DSCAL, DTRMV
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX
@@ -158,7 +158,6 @@
          INFO = -5
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DTRTI2', -INFO )
          RETURN
       END IF
 *

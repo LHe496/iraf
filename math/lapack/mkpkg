@@ -35,5 +35,4 @@ liblapack.a:
 	sscal.f
 	sswap.f
 	strsm.f
-	xerbla.f
 	;
