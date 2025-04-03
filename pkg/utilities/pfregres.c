@@ -1,3 +1,57 @@
+/* pfregres.c
+ * Rewritten by Linbo He <Linbo_He@outlook.com>
+ * Rewritten date: April 3, 2025
+ *
+ * Rewritten in C from the original Fortran code
+ * The orginal FORTRAN code was modified from regres.f
+ * 
+ * The rewitten version uses LAPACK to do matrix inversion
+ *
+ * source
+ *   Bevington, pages 172-175.
+ *
+ * purpose
+ *   make a mulitple linear regression fit to data with a specified
+ *      function which is linear in coefficients
+ *
+ * usage
+ *   call regres (x, y, sigmay, npts, nterms, m, mode, yfit,
+ *      a0, a, sigma0, sigmaa, r, rmul, chisqr, ftest)
+ *
+ * description of parameters
+ *   x	   - array of points for independent variable
+ *   y	   - array of points for dependent variable
+ *   sigmay - array of standard deviations for y data points
+ *   npts   - number of pairs of data points
+ *   nterms - number of coefficients
+ *   m	   - array of inclusion/rejection criteria for fctn
+ *   mode   - determines method of weighting least-squares fit
+ *	     +1 (instrumental) weight(i) = 1./sigmay(i)**2
+ *	      0 (no weighting) weight(i) = 1.
+ *	     -1 (statistical)  weight(i) = 1./y(i)
+ *   yfit   - array of calculated values of y
+ *   a0	   - constant term
+ *   a	   - array of coefficients
+ *   sigma0 - standard deviation of a0
+ *   sigmaa - array of standard deviations for coefficients
+ *   r	   - array of linear correlation coefficients
+ *   rmul   - multiple linear correlation coefficient
+ *   chisqr - reduced chi square for fit
+ *   ftest  - value of f for test of fit
+ *
+ * subroutines and function subprograms required
+ *   fctn (x, i, j, m)
+ *      evaluates the function for the jth term and the ith data point
+ *      using the array m to specify terms in the function
+ *   matinv (array, nterms, det)
+ *      inverts a symmetric two-dimensional matrix of degree nterms
+ *      and calculates its determinant
+ *
+ * comments
+ * (dim npts changed 100->1000 21-may-84 dct)
+ *   dimension statement valid for npts up to 100 and nterms up to 10
+ *   sigmaag changed to sigmaa in statement following statement 132
+ */
 #define import_spp
 #include <iraf.h>
 #include <math.h>
@@ -17,13 +71,13 @@ pfregs_ (
     float (*fctn)(float*, XINT*, XINT*, XINT*)
 )
 {
+    /* Initiallize sums and arrays */
     double xmean[10], sigmax[10];
-    double sum = 0., ymean = 0., sigma = 0., chisq;
+    double sum = 0., ymean = 0., sigma = 0., chisq = 0.;
     float weight[1000];
 
     double* array = (double*)malloc((*nterms) * (*nterms) * sizeof(double));
 
-    chisq = 0.;
     *rmul = 0.;
 
     for (int i = 0; i < *npts; i++) {
@@ -41,6 +95,7 @@ pfregs_ (
         }
     }
 
+    /* Accumulate weighted sums */
     for (int i = 0; i < *npts; i++) {
 
         if (*mode == 0 || y[i] == 0) {
@@ -66,13 +121,13 @@ pfregs_ (
         xmean[i] /= sum;
     }
 
-    float fnpts = *npts;
-    float wmean = sum / fnpts;
+    float wmean = sum / (*npts);
 
     for (int i =0; i < *npts; i++) {
         weight[i] /= wmean;
     }
 
+    /* Accumulate matrices r and array */
     for (int i = 0; i < *npts; i++) {
         sigma += weight[i] * (y[i] - ymean) * (y[i] - ymean);
         for (int j = 0; j < *nterms; j++) {
@@ -99,6 +154,7 @@ pfregs_ (
         }
     }
 
+    /* Invert symmetric matrix */
     XINT info;
     XINT* ipiv = (XINT*)malloc((*nterms)*sizeof(XINT));
     dgetrf_(nterms, nterms, array, nterms, ipiv, &info);
@@ -119,6 +175,7 @@ pfregs_ (
     free(ipiv);
 
 
+    /* Calculate coefficients, fits, and chi square */
     *a0 = ymean;
     for (int i = 0; i < *nterms; i++) {
         for (int j = 0; j <= i; j++) {
@@ -138,6 +195,7 @@ pfregs_ (
     float freen = *npts - *nterms - 1;
     *chisqr = chisq * wmean / freen;
 
+    /* Calculate uncertainties */
     float varnce;
     if (*mode == 0) {
         varnce = *chisqr;
@@ -145,7 +203,6 @@ pfregs_ (
         varnce = 1. / wmean;
     }
 
-    float freej;
     for (int i = 0; i < *nterms; i++) {
         sigmaa[i] = varnce * array[i+i*(*nterms)] / (free1 * POW2(sigmax[i]));
         if (sigmaa[i] > 0) {
@@ -155,14 +212,16 @@ pfregs_ (
         }
         *rmul += a[i] * r[i] * sigmax[i] / sigma;
     }
-    freej = *nterms;
 
+    /* +noao: When rmul = 1, the following division (stmt 135) would blow up.
+     *        It has been changed so ftest is set to -99999. in this case.
+     */
     if (*rmul < 0) {
         *ftest = -99999.;
         *rmul = -99999.;
     } else {
         if (abs(*rmul) < 1.) {
-            *ftest = (*rmul / freej) / ((1. - *rmul) / freen);
+            *ftest = (*rmul / (*nterms)) / ((1. - *rmul) / freen); // stmt 135
             *rmul = sqrt(*rmul);
         } else if (abs(*rmul) == 1.) {
             *ftest = -99999;
@@ -172,6 +231,7 @@ pfregs_ (
             *rmul = 99999.;
         }
     }
+    /* -noao */
 
     *sigma0 = varnce / fnpts;
 
