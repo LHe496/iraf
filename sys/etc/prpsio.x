@@ -1,6 +1,7 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 include	<gio.h>
+include	<gki.h>
 include	<fio.h>
 include	<fset.h>
 include	<chars.h>
@@ -51,6 +52,7 @@ int	rwflag			# type of transfer to wait for
 pointer	ip, op
 int	stack[LEN_STACK], stkp, nchars, nleft
 int	stream, pr, in, record_type, rq, iotype
+short	cursor_value[2]
 int	pseudofile, destfd, destpr, destination, ps, flags
 bool	filter_gki, graphics_stream, xmit_pending, ioctrl
 
@@ -222,6 +224,17 @@ begin
 
 			if (read (in, Memc[ip], nchars) < nchars)
 			    call syserr (SYS_PRIPCSYNTAX)
+
+			# A cursor response replaces the GETCURSOR instruction which
+			# was buffered on the graphics stream for the external kernel.
+			# Leaving that request in place shifts the reply by four words.
+			if (graphics_stream &&
+			    nchars == GKI_CURSORVALUE_LEN * SZ_SHORT) {
+			    call amovs (Memc[ip], cursor_value, 2)
+			    if (cursor_value[1] == BOI &&
+				cursor_value[2] == GKI_CURSORVALUE)
+				call fseti (destfd, F_CANCEL, OK)
+			}
 
 			# If writing to a standard stream and a raw mode i/o
 			# control sequence is seen, do a fseti on STDIN in
