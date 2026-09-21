@@ -98,6 +98,24 @@ begin
 		call gki_write (stream, Mems[gki])
 		call gtr_delete (tr, gki)
 
+	    case GKI_SETCURSOR:
+		# The cursor position is device state, not picture content: it
+		# positions the pointer, or the device's own crosshair, for the
+		# next cursor read, and a redraw that repeats it moves it a
+		# second time.  When the redraw is the one a window resize
+		# triggers, the pointer drags the window along with it and the
+		# window shrinks with every redraw.  Send the instruction when
+		# it is issued, but leave it out of the frame buffer.  The
+		# position is a GKI coordinate like any other, so it keeps the
+		# workstation transformation of the default case.
+		if (status == OK) {
+		    if (wstranset == YES)
+			call gtr_wstran (Mems[gki])
+		    else
+			call gki_write (stream, Mems[gki])
+		}
+		call gtr_delete (tr, gki)
+
 	    case GKI_CLEAR:
 		# Clear is special because it initializes things.
 		if (status != OK) {
